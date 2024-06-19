@@ -28,7 +28,7 @@ jobs:
       run: npm i
 
     - name: Run Storybook
-      run: npm run storybook
+      run: npm run storybook &
     - name: Give some time to start the Storybook server
       run: |
         echo "Start sleeping..."
