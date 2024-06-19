@@ -37,4 +37,4 @@ jobs:
     - name: upload screenshots
       env:
         PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN }}
-      run: smartui storybook http://localhost:6006 --config .smartui.json
+      run: npx smartui storybook http://localhost:6006 --config .smartui.json
