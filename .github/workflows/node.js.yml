@@ -26,7 +26,8 @@ jobs:
         cache: 'npm'
     - name: Install dependencies
       run: npm i
-
+    - name: Install Lambda CLI
+      run: npm install @lambdatest/smartui-storybook -g
     - name: Run Storybook
       run: npm run storybook &
     - name: Give some time to start the Storybook server
