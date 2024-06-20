@@ -6,7 +6,8 @@ name: Test Storybook with SmartUI
 on:
   push:
     branches: [ "main" ]
-
+  pull_request:
+    branches: [ "main" ]
 env:
   PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN }}
 jobs:
