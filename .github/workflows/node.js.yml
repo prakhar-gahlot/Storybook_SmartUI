@@ -47,7 +47,7 @@ jobs:
     - name: Install Lambda CLI
       run: npm install @lambdatest/smartui-storybook -g
     - name: Run Storybook
-      run: npm run storybook &
+      run: npm run build-storybook
     - name: Give some time to start the Storybook server
       run: |
         echo "Start sleeping..."
@@ -56,7 +56,7 @@ jobs:
     - name: upload screenshots
       env:
         PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN }}
-      run: npx smartui storybook http://localhost:6006 --config .smartui.json
+      run: npx smartui storybook ./storybook-static --config .smartui.json
     - name: Give some time to let the previous comparison finish
       run: |
         echo "Start sleeping..."
@@ -83,4 +83,4 @@ jobs:
     - name: upload screenshots for the 2nd project
       env:
         PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN2 }}
-      run: npx smartui storybook http://localhost:6006 --config .smartui.json
+      run: npx smartui storybook ./storybook-static --config .smartui.json
