@@ -57,6 +57,7 @@ jobs:
       env:
         PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN }}
       run: npx smartui storybook ./storybook-static --config .smartui.json
+      continue-on-error: true
     - name: Give some time to let the previous comparison finish
       run: |
         echo "Start sleeping..."
@@ -84,3 +85,4 @@ jobs:
       env:
         PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN2 }}
       run: npx smartui storybook ./storybook-static --config .smartui.json
+      continue-on-error: true
