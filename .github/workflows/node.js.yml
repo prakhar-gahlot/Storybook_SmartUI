@@ -125,11 +125,13 @@ jobs:
 
       - name: Run API call with Build ID for 2nd project
         env:
+          BUILD_ID: ${{ steps.upload_screenshots_2.outputs.build_id_2 }}
           PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN2 }}
           API_AUTH: ${{ secrets.API_AUTH }}
         run: |
+          sleep 30  # Sleep for 30 seconds
           BUILD_ID="${{ steps.upload_screenshots_2.outputs.build_id_2 }}"
           echo "Using Build ID: $BUILD_ID"
           echo "Using Project Token: $PROJECT_TOKEN"
-          curl -X GET "https://api.lambdatest.com/automation/smart-ui/build/status?projectToken=${PROJECT_TOKEN}&buildId=${{ steps.upload_screenshots.outputs.build_id }}" -H "accept: application/json" -H "Authorization: Basic ${API_AUTH}"
+          curl -X GET 'https://api.lambdatest.com/automation/smart-ui/build/status?projectToken=${PROJECT_TOKEN}&buildId=$BUILD_ID' -H "accept: application/json" -H "Authorization: Basic ${API_AUTH}"
         if: always()
