@@ -133,5 +133,5 @@ jobs:
           BUILD_ID="${{ steps.upload_screenshots_2.outputs.build_id_2 }}"
           echo "Using Build ID: $BUILD_I"
           echo "Using Project Token: $PROJECT_TOKE"
-          curl -L 'https://api.lambdatest.com/automation/smart-ui/build/status?projectToken=${PROJECT_TOKE}&buildId=${BUILD_I}' -H 'accept: application/json' -H 'Authorization: Basic ${API_AUTH}'
+          curl -L 'https://api.lambdatest.com/automation/smart-ui/build/status?projectToken=${PROJECT_TOKE}&buildId=${BUILD_I}' -H 'accept: application/json' -H 'Authorization: Basic ${{ secrets.API_AUTH }}'
         if: always()
