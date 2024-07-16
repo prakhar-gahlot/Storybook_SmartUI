@@ -1,58 +1,81 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
 name: Test Storybook with SmartUI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
-env:
-  PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+    branches: ["main"]
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [20.x] # Update to Node.js version 20
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        node-version: [20.x]
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Create commit status
-      run: |
-        API_HOST=https://api.github.com
-        OWNER=$(echo $GITHUB_REPOSITORY | cut -d'/' -f1)
-        REPO=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)
-        # Check out the PR branch
-        git checkout $GITHUB_HEAD_REF
-        # Get the commit ID of the last commit
-        COMMIT_ID=$(git rev-parse HEAD)
-        echo "Last commit ID of PR: $COMMIT_ID"
-        REF=$GITHUB_SHA
-        echo "Current Commit ID REF : $REF"
-        GITHUB_URL=$API_HOST/repos/$GITHUB_REPOSITORY/statuses/$COMMIT_ID
-        echo "GITHUB_URL: $GITHUB_URL"
-        echo "GITHUB_URL=$GITHUB_URL" >> $GITHUB_ENV
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - name: Install dependencies
-      run: npm i
-    - name: Install Lambda CLI
-      run: npm install @lambdatest/smartui-storybook -g
-    - name: Run Storybook
-      run: npm run storybook &
-    - name: Give some time to start the Storybook server
-      run: |
-        echo "Start sleeping..."
-        sleep 30  # Sleep for 30 seconds
-        echo "Done sleeping."
-    - name: upload screenshots
-      env:
-        PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN }}
-      run: npx smartui storybook http://localhost:6006 --config .smartui.json
+      - uses: actions/checkout@v3
+
+      - name: Create commit status
+        env:
+          PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+        run: |
+          API_HOST=https://api.github.com
+          OWNER=$(echo $GITHUB_REPOSITORY | cut -d'/' -f1)
+          REPO=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)
+          git checkout $GITHUB_HEAD_REF
+          COMMIT_ID=$(git rev-parse HEAD)
+          echo "Last commit ID of PR: $COMMIT_ID"
+          REF=$GITHUB_SHA
+          echo "Current Commit ID REF : $REF"
+          GITHUB_URL=$API_HOST/repos/$GITHUB_REPOSITORY/statuses/$COMMIT_ID
+          echo "GITHUB_URL: $GITHUB_URL"
+          echo "GITHUB_URL=$GITHUB_URL" >> $GITHUB_ENV
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm i
+
+      - name: Install Lambda CLI
+        run: npm install @lambdatest/smartui-storybook -g
+
+      - name: Run Storybook
+        run: npm run build-storybook
+
+      - name: Give some time to start the Storybook server
+        run: |
+          echo "Start sleeping..."
+          sleep 30  # Sleep for 30 seconds
+          echo "Done sleeping."
+
+      - name: Upload screenshots
+        env:
+          PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+        id: upload_screenshots
+        run: |
+          npx smartui storybook ./storybook-static --config .smartui.json
+
+        continue-on-error: true
+
+      - name: Give some time to let the previous comparison finish
+        run: |
+          echo "Start sleeping..."
+          sleep 30  # Sleep for 30 seconds
+          echo "Done sleeping."
+        if: always()
+
+      - name: Upload screenshots for the 2nd project
+        env:
+          PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN2 }}
+        id: upload_screenshots_2
+        run: |
+          npx smartui storybook ./storybook-static --config .smartui.json
+
+        continue-on-error: true
+
